@@ -3,7 +3,8 @@ import os
 from dotenv import load_dotenv
 from langchain_core.messages import HumanMessage, ToolMessage
 from langchain_core.tools import tool
-from langchain_openai import ChatOpenAI
+from langchain_openai import ChatOpenAI, AzureChatOpenAI
+
 load_dotenv()
 
 @tool
@@ -20,12 +21,14 @@ def calculate_tax(subtotal: float, state: str) -> float:
 
 # Initialize the model and bind the tool schema directly to it
 # Initialize the model pointing to your LiteLLM proxy
-model = ChatOpenAI(
+model = AzureChatOpenAI(
     model="gpt-4o-mini",
     temperature=0,
     base_url=os.environ.get("LITELLM_API_BASE"),
-    api_key=os.environ.get("LITELLM_KEY")
+    api_key=os.environ.get("LITELLM_KEY"),
+    api_version="2025-01-01-preview"
 )
+
 model_with_tools = model.bind_tools([calculate_tax])
 
 # 1. Ask the question requiring a tool
