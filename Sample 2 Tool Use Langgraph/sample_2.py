@@ -2,7 +2,7 @@ import os
 from dotenv import load_dotenv
 from langchain_core.tools import tool
 from langchain_openai import ChatOpenAI
-from langgraph.prebuilt import create_react_agent  # <--- The automatic harness
+from langchain.agents import create_agent
 
 load_dotenv()
 
@@ -28,7 +28,7 @@ model = ChatOpenAI(
 
 # 2. Compile them into an automatic agent
 # This wraps the model and the tools into a loop that manages the execution for you!
-agent = create_react_agent(model, tools=[calculate_tax])
+agent = create_agent(model, tools=[calculate_tax])
 
 # 3. Run the agent
 user_prompt = "I bought a device for $100 in CA. How much tax do I owe?"
