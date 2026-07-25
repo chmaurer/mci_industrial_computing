@@ -1,0 +1,10 @@
+[project]
+name = "sample-5-a2a-localhost"
+version = "0.1.0"
+description = "Add your description here"
+requires-python = ">=3.11"
+dependencies = [
+    "a2a-sdk>=1.1.2",
+    "google-adk>=2.5.0",
+    "sse-starlette>=3.4.6",
+]
