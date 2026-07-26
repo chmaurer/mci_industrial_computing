@@ -1,11 +1,9 @@
 import asyncio
 import os
 from uuid import uuid4
-
 import httpx
 import requests
 from dotenv import load_dotenv
-
 
 load_dotenv()  # Load environment variables
 
@@ -16,7 +14,7 @@ API_KEY = os.getenv("OPENAI_API_KEY")
 # sudo docker run --name=matprod --rm -p 8022:8022 192.168.1.60:8083/repository/dockerrepo/material-production:1.1
 
 HEADERS = {"Authorization": f"Bearer {os.getenv('OPENAI_API_KEY')}"}
-HEADERS_2 = {"x-litellm-api-key": f"{os.getenv('OPENAI_API_KEY')}"}
+
 
 def discover_agents():
     """Fetch all configured agents from LiteLLM."""
@@ -46,10 +44,8 @@ async def call_a2a(agent_id, text):
 
 async def call_via_litellm(agent_id: str, prompt: str):
     headers = {"Authorization": f"Bearer {API_KEY}"}
-    timeout_config = httpx.Timeout(120.0, connect=10.0)
 
-    async with httpx.AsyncClient(timeout=timeout_config) as client:
-        # 1. SEND (Exactly like before, but Agent ID is handled by LiteLLM)
+    async with httpx.AsyncClient(timeout=httpx.Timeout(120.0, connect=10.0)) as client:
         send_payload = {
             "jsonrpc": "2.0",
             "method": "message/send",
@@ -65,19 +61,23 @@ async def call_via_litellm(agent_id: str, prompt: str):
             "id": str(uuid4())
         }
 
-        resp = await client.post(LITELLM_URL+"/v1/a2a/"+agent_id+"/message/send", json=send_payload, headers=headers)
+        resp = await client.post(
+            LITELLM_URL + "/v1/a2a/" + agent_id + "/message/send",
+            json=send_payload,
+            headers=headers
+        )
         resp.raise_for_status()
 
         data = resp.json()
-
-        # Extracting the text from the synchronous result
-        # Note: Adjust the keys based on your specific agent's response structure
         result = data.get("result", {})
         history = result.get("parts", [])
 
+        # Parse text or raw content from the response parts
         for entry in reversed(history):
-            if entry.get("kind") in ["text"]:
-                return entry["text"]
+            if entry.get("kind") == "text":
+                return entry.get("text", "").strip()
+            elif entry.get("kind") == "data":
+                return str(entry.get("data", "")).strip()
 
         return "No agent response found in history."
 
@@ -104,11 +104,18 @@ async def resolve_agent_by_description(client: httpx.AsyncClient, keyword: str):
             print(f"Found Agent: {agent.get('agent_name')} ({agent.get('agent_id')})")
             return agent.get("agent_id")
 
+
 async def run():
     agents = discover_agents()
     print(f"Found agents: {list(agents.keys())}")
 
-    order_text = "We need to schedule production for material '149449' and '255565'."
+    order_text = (""
+                  "Hi there! "
+                  ""
+                  "I have heard that you do produce products I am really fond of. I have looked up your products on "
+                  "the web and I'd like to get an order started for items 149449 and 255565. However, the order numbers could also be 90393032 or 9382388, I was unsure to identify them correctly on the website."
+                  ""
+                  "Could you let me know what the production timeline looks like for both?")
 
     # Step 1: Extract numbers
     print("Calling Extraction Agent...")
