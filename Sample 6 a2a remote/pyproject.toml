@@ -1,0 +1,12 @@
+[project]
+name = "sample-6-a2a-remote"
+version = "0.1.0"
+description = "Add your description here"
+requires-python = ">=3.11"
+dependencies = [
+    "fasta2a[pydantic-ai]>=0.6.1",
+    "httpx>=0.28.1",
+    "python-dotenv>=1.2.2",
+    "requests>=2.34.2",
+    "uvicorn>=0.51.0",
+]

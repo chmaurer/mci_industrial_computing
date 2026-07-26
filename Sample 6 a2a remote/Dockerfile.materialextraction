@@ -1,0 +1,25 @@
+FROM python:3.11-slim
+
+# 1. Prevent Python from writing .pyc files and enable unbuffered output logging
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PYTHONPATH="/app"
+
+# 2. Install uv binary
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
+
+WORKDIR /app
+
+# 3. Install system dependencies directly using uv
+RUN uv pip install --system --no-cache \
+    "pydantic-ai[openai]>=1.0.0" \
+    "fasta2a>=0.6.0" \
+    "python-dotenv" \
+    "uvicorn"
+
+# 4. Copy application source code
+COPY . .
+
+# 5. Expose port and start Uvicorn application on port 8021
+EXPOSE 8021
+CMD ["uvicorn", "agent_material_extraction:app", "--host", "0.0.0.0", "--port", "8021"]
