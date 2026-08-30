@@ -14,7 +14,7 @@ from main import resolve_agent_by_description, call_via_litellm
 """
 load_dotenv()
 # Point to your LiteLLM instance base URL
-LITELLM_URL = "http://192.168.1.60:4000"
+LITELLM_URL = "http://192.168.1.62:4000"
 API_KEY = os.getenv("OPENAI_API_KEY")
 
 
@@ -27,7 +27,7 @@ async def main():
 
             # 2. INVOKE
             numbers = await call_via_litellm(target_id,
-                                             "I want to order 12 pieces of material 252653 and 1 piece of material 252654.")
+                                             "I want to order twelve pieces of material 252653 and one piece of material 252654.")
             print(f"Result: {numbers}")
 
         except Exception as e:

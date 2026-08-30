@@ -7,11 +7,13 @@ from dotenv import load_dotenv
 
 load_dotenv()  # Load environment variables
 
-LITELLM_URL = "http://192.168.1.60:4000"
+LITELLM_URL = "http://192.168.1.62:4000"
 API_KEY = os.getenv("OPENAI_API_KEY")
 
-# sudo docker run --name=matextract --rm -p 8021:8021 192.168.1.60:8083/repository/dockerrepo/material-extractor:1.4
-# sudo docker run --name=matprod --rm -p 8022:8022 192.168.1.60:8083/repository/dockerrepo/material-production:1.1
+# register agents on litellm
+# add IPs to user_url_allowed_hosts in litellm config.yaml
+# sudo docker run --name=matextract --rm -p 8021:8021 192.168.1.62:8083/repository/dockerrepo/material-extractor:1.4
+# sudo docker run --name=matprod --rm -p 8022:8022 192.168.1.62:8083/repository/dockerrepo/material-production:1.1
 
 HEADERS = {"Authorization": f"Bearer {os.getenv('OPENAI_API_KEY')}"}
 
@@ -62,25 +64,34 @@ async def call_via_litellm(agent_id: str, prompt: str):
         }
 
         resp = await client.post(
-            LITELLM_URL + "/v1/a2a/" + agent_id + "/message/send",
+            f"{LITELLM_URL}/v1/a2a/{agent_id}/message/send",
             json=send_payload,
             headers=headers
         )
         resp.raise_for_status()
 
         data = resp.json()
-        result = data.get("result", {})
-        history = result.get("parts", [])
 
-        # Parse text or raw content from the response parts
-        for entry in reversed(history):
-            if entry.get("kind") == "text":
-                return entry.get("text", "").strip()
-            elif entry.get("kind") == "data":
-                return str(entry.get("data", "")).strip()
+        # Flexibly parse A2A / JSON-RPC structures
+        parts = data.get("result", {}).get("message", {}).get("parts", [])
+        if not parts:
+            parts = data.get("result", {}).get("parts", [])
+
+        for entry in reversed(parts):
+            # Check text in various possible positions
+            if isinstance(entry, dict):
+                if entry.get("kind") == "text" and "text" in entry:
+                    return entry["text"].strip()
+                if "content" in entry:
+                    return str(entry["content"]).strip()
+                if "text" in entry:
+                    return str(entry["text"]).strip()
+
+        # Fallback to stringifying the raw result if structure is unknown
+        if "result" in data:
+            return str(data["result"]).strip()
 
         return "No agent response found in history."
-
 
 async def resolve_agent_by_description(client: httpx.AsyncClient, keyword: str):
     """

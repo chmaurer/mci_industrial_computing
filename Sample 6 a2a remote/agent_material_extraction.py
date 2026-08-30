@@ -2,6 +2,7 @@ import os
 import re
 from dotenv import load_dotenv
 from fasta2a.pydantic_ai import agent_to_a2a
+from pydantic import BaseModel, Field
 from pydantic_ai import Agent
 from pydantic_ai.models.openai import OpenAIChatModel
 from pydantic_ai.providers.openai import OpenAIProvider
@@ -22,14 +23,16 @@ model = OpenAIChatModel(
     )
 )
 logger = logging.getLogger(__name__)
+
+
 agent = Agent(
     model,
     system_prompt=(
-        "You are a strict data extraction agent. "
-        "CRITICAL RULE: You MUST call the 'extract_material_numbers' tool FIRST on every single query, "
-        "even if you think you see numbers in the text. "
-        "After receiving the tool result, output ONLY the raw numbers as a comma-separated string (e.g. 149449, 255565). "
-        "Do NOT output any other text or explanation."
+        "You are a strict data extraction engine. "
+        "Your ONLY task is to run the 'extract_material_numbers' tool on the input text. "
+        "Once the tool returns the list of numbers, return ONLY those numbers separated by commas. "
+        "Example output: 355644, 755654\n"
+        "DO NOT write polite greetings, explanations, or sentences."
     )
 )
 
@@ -50,6 +53,7 @@ def extract_material_numbers(text: str) -> list[str]:
 
     logger.info(f"Filtered Numbers: {filtered_numbers}")
     return filtered_numbers
+
 
 # Expose as A2A
 app = agent_to_a2a(agent)
