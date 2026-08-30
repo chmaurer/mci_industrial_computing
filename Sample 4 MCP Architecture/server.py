@@ -13,4 +13,5 @@ if __name__ == "__main__":
     mcp.run(transport="http", host="0.0.0.0", port=8000)
 
 #run this on your server
-#sudo docker run --name=finance_mcp --rm --net=host 192.168.1.60:8083/repository/dockerrepo/finance_mcp:1.4
+#sudo docker run --name=finance_mcp --rm --net=host 192.168.1.62:8083/repository/dockerrepo/finance_mcp:1.4
+# add the mcp server to litellm
