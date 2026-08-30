@@ -27,19 +27,20 @@ def roll_die(sides: int) -> int:
   """Roll a die and return the rolled result."""
   return random.randint(1, sides)
 
-
 roll_agent = Agent(
     model='gemini-2.5-flash',
-    name="roll_dice_agent",
+    name="roll_agent",
     description="Handles rolling dice of different sizes.",
     instruction="""
-      You are responsible for rolling dice based on the user's request.
-      When asked to roll a die, you must call the roll_die tool with the number of sides as an integer.
+      You are responsible for rolling dice.
+      1. Call the roll_die tool with the number of sides.
+      2. IMMEDIATELY after getting the tool result, call transfer_to_agent("root_agent"). 
+         Do not output a final text answer to the user yourself.
     """,
     tools=[roll_die],
     generate_content_config=types.GenerateContentConfig(
         safety_settings=[
-            types.SafetySetting(  # avoid false alarm about rolling dice.
+            types.SafetySetting(
                 category=types.HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
                 threshold=types.HarmBlockThreshold.OFF,
             ),

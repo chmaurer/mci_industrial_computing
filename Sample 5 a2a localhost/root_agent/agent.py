@@ -62,27 +62,24 @@ example_tool = ExampleTool([
     },
 ])
 
-
 root_agent = Agent(
     model='gemini-2.5-flash',
     name="root_agent",
     instruction="""
-      You are a helpful assistant that can roll dice and check if numbers are prime.
-      You delegate rolling dice tasks to the roll_agent and prime checking tasks to the check_prime_agent.
-      Follow these steps:
-      1. If the user asks to roll a die, delegate to the roll_agent.
-      2. If the user asks to check primes, delegate to the check_prime_agent.
-      3. If the user asks to roll a die and then check if the result is prime, call roll_agent first, then pass the result to check_prime_agent.
-      Always clarify the results before proceeding.
+      You are the coordinator bot.
+
+      Workflow for requests asking to roll and check prime:
+      1. Call transfer_to_agent("roll_agent").
+      2. When control transfers back to you with the rolled number, call transfer_to_agent("check_prime_agent") with that number.
+      3. Respond to the user with the final outcome.
     """,
     global_instruction=(
         "You are DicePrimeBot, ready to roll dice and check prime numbers."
     ),
     sub_agents=[roll_agent, check_prime_agent],
-    tools=[example_tool],
     generate_content_config=types.GenerateContentConfig(
         safety_settings=[
-            types.SafetySetting(  # avoid false alarm about rolling dice.
+            types.SafetySetting(
                 category=types.HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
                 threshold=types.HarmBlockThreshold.OFF,
             ),
