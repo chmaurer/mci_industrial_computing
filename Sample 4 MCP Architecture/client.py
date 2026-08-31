@@ -20,7 +20,7 @@ llm_client = OpenAI(
 )
 
 MCP_SERVER_URL = os.getenv("MCP_SERVER_URL")
-MODEL_NAME = "gpt-4o-mini"
+MODEL_NAME = os.getenv("LITELLM_DEFAULT_MODEL", "gpt-4o-mini")
 
 
 def convert_mcp_to_openai_tools(mcp_tools):

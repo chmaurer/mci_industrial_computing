@@ -20,7 +20,7 @@ def calculate_tax(subtotal: float, state: str) -> float:
 
 # 1. Define your LLM pointing to your LiteLLM proxy
 model = ChatOpenAI(
-    model="gpt-4o-mini",
+    model=os.environ.get("LITELLM_DEFAULT_MODEL", "gpt-4o-mini"),
     temperature=0,
     base_url=os.environ.get("LITELLM_API_BASE"),
     api_key=os.environ.get("LITELLM_KEY")
