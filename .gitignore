@@ -1,5 +1,4 @@
-/Sample 1 Tool Use/.env
-/Sample 2 Tool Use Langgraph/.env
-/Sample 4 MCP Architecture/.env
-/Sample 5 a2a localhost/.env
-/Sample 6 a2a remote/.env
+.env
+**/.env
+**/__pycache__/
+**/roll_agent/.adk/

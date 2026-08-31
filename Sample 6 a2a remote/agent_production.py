@@ -9,7 +9,7 @@ import uvicorn
 load_dotenv()
 
 model = OpenAIChatModel(
-    'gpt-4o-mini',
+    os.getenv("LITELLM_DEFAULT_MODEL", "gpt-4o-mini"),
     provider=OpenAIProvider(
         base_url=os.getenv("OPENAI_BASE_URL"),
         api_key=os.getenv("OPENAI_API_KEY"),
