@@ -12,24 +12,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os
 import random
 
-from dotenv import load_dotenv
 from google.adk.agents.llm_agent import Agent
 from google.adk.agents.remote_a2a_agent import AGENT_CARD_WELL_KNOWN_PATH
 from google.adk.agents.remote_a2a_agent import RemoteA2aAgent
 from google.adk.tools.example_tool import ExampleTool
 from google.genai import types
 
-load_dotenv(os.path.join(os.path.dirname(__file__), "..", ".env"))
+from model_config import get_model
 # --- Roll Die Sub-Agent ---
 def roll_die(sides: int) -> int:
   """Roll a die and return the rolled result."""
   return random.randint(1, sides)
 
 roll_agent = Agent(
-    model=os.environ.get("GOOGLE_DEFAULT_MODEL", "gemini-2.5-flash"),
+    model=get_model(),
     name="roll_agent",
     description="Handles rolling dice of different sizes.",
     instruction="""
