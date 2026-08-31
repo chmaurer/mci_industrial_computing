@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import os
 import random
 
 from dotenv import load_dotenv
@@ -23,7 +24,7 @@ from google.genai import types
 
 from check_prime_agent.agent import check_prime_agent
 from roll_agent.agent import roll_agent
-load_dotenv("../.env")
+load_dotenv(os.path.join(os.path.dirname(__file__), "..", ".env"))
 example_tool = ExampleTool([
     {
         "input": {
@@ -63,7 +64,7 @@ example_tool = ExampleTool([
 ])
 
 root_agent = Agent(
-    model='gemini-2.5-flash',
+    model=os.environ.get("GOOGLE_DEFAULT_MODEL", "gemini-2.5-flash"),
     name="root_agent",
     instruction="""
       You are the coordinator bot.

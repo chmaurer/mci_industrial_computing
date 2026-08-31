@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import os
 import random
 from time import sleep
 
@@ -19,7 +20,7 @@ from dotenv import load_dotenv
 from google.adk import Agent
 from google.genai import types
 
-load_dotenv("../.env")
+load_dotenv(os.path.join(os.path.dirname(__file__), "..", ".env"))
 
 async def check_prime(nums: list[int]) -> str:
   """Check if a given list of numbers are prime.
@@ -50,7 +51,7 @@ async def check_prime(nums: list[int]) -> str:
 
 
 check_prime_agent = Agent(
-    model='gemini-2.5-flash',
+    model=os.environ.get("GOOGLE_DEFAULT_MODEL", "gemini-2.5-flash"),
     name='check_prime_agent',
     description='check prime agent that can check whether numbers are prime.',
     instruction="""
