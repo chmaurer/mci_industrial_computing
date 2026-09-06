@@ -31,19 +31,6 @@ def discover_agents():
     return {a['agent_name']: a['agent_id'] for a in agents_data}
 
 
-async def call_a2a(agent_id, text):
-    """Call the A2A Gateway."""
-    payload = {"message": {"parts": [{"text": text}]}}  # A2A format
-    async with httpx.AsyncClient() as client:
-        response = await client.post(
-            f"{LITELLM_URL}/v1/a2a/{agent_id}/message/send",
-            headers=HEADERS,
-            json=payload,
-        )
-        response.raise_for_status()
-        return response.json()["message"]["parts"][0]["text"]  # Extract message
-
-
 async def call_via_litellm(agent_id: str, prompt: str):
     headers = {"Authorization": f"Bearer {API_KEY}"}
 
@@ -92,28 +79,6 @@ async def call_via_litellm(agent_id: str, prompt: str):
             return str(data["result"]).strip()
 
         return "No agent response found in history."
-
-async def resolve_agent_by_description(client: httpx.AsyncClient, keyword: str):
-    """
-    Looks up the /v1/agents list and finds an agent where
-    the keyword exists in the description.
-    """
-    headers = {"Authorization": f"Bearer {API_KEY}", "accept": "application/json"}
-
-    # LiteLLM might use 'x-litellm-api-key' or 'Authorization'
-    # based on your curl, let's include the specific key header too
-    headers["x-litellm-api-key"] = API_KEY
-
-    resp = await client.get(f"{LITELLM_URL}/v1/agents", headers=headers)
-    resp.raise_for_status()
-
-    agents = resp.json()
-    for agent in agents:
-        desc = agent.get("agent_card_params", {}).get("description", "")
-        # Check if our keyword is inside the description (case-insensitive)
-        if keyword.lower() in desc.lower():
-            print(f"Found Agent: {agent.get('agent_name')} ({agent.get('agent_id')})")
-            return agent.get("agent_id")
 
 
 async def run():

@@ -1,1 +1,6 @@
 /.env
+*/modules.xml
+.idea/
+*.iml
+__pycache__/
+*.db
