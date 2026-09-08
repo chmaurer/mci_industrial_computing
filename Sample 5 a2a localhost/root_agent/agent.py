@@ -14,7 +14,6 @@
 
 import random
 
-from dotenv import load_dotenv
 from google.adk.agents.llm_agent import Agent
 from google.adk.agents.remote_a2a_agent import AGENT_CARD_WELL_KNOWN_PATH
 from google.adk.agents.remote_a2a_agent import RemoteA2aAgent
@@ -23,7 +22,7 @@ from google.genai import types
 
 from check_prime_agent.agent import check_prime_agent
 from roll_agent.agent import roll_agent
-load_dotenv("../.env")
+from model_config import get_model
 example_tool = ExampleTool([
     {
         "input": {
@@ -63,7 +62,7 @@ example_tool = ExampleTool([
 ])
 
 root_agent = Agent(
-    model='gemini-2.5-flash',
+    model=get_model(),
     name="root_agent",
     instruction="""
       You are the coordinator bot.
